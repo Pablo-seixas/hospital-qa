@@ -1,0 +1,438 @@
+# README2
+
+## Backend – Sistema Hospitalar (Node.js + TypeScript + Prisma + JWT)
+
+Este documento descreve detalhadamente tudo que foi implementado no backend até o momento, incluindo autenticação profissional com Access Token + Refresh Token, estrutura do banco de dados, controle de permissões e configurações de ambiente.
+
+Este README deve ser usado como referência oficial para futuras manutenções, expansão do sistema ou migração para produção.
+
+---
+
+# 1. Arquitetura Geral
+
+Backend desenvolvido com:
+
+* Node.js
+* TypeScript
+* Express
+* Prisma ORM
+* PostgreSQL
+* JWT (Access + Refresh Token)
+* Zod (validação)
+* Rate Limit
+* Auditoria (AuditLog)
+
+A arquitetura é modular, organizada por responsabilidade:
+
+* src/config → configurações (env)
+* src/db → conexão Prisma + seed
+* src/modules → módulos separados por domínio
+* src/utils → funções auxiliares (crypto, jwt, refresh)
+* prisma → schema do banco
+
+A estrutura foi planejada para crescimento futuro sem virar código desorganizado.
+
+---
+
+# 2. Banco de Dados (Prisma)
+
+O banco usa PostgreSQL com Prisma ORM.
+
+Modelos principais criados:
+
+## Employee
+
+Representa funcionários do hospital.
+
+Campos principais:
+
+* id
+* employeeNumber
+* name
+* email
+* phone
+* role
+* jobTitle
+* sector
+* passwordHash
+* status (ACTIVE ou TERMINATED)
+* canBuildTeam (controle de permissão)
+* terminatedAt
+* terminatedByEmployeeId
+
+Relacionamentos:
+
+* auditLogs
+* refreshTokens
+
+---
+
+## Patient
+
+Representa pacientes cadastrados.
+
+Campos:
+
+* id
+* name
+* documentType
+* documentId
+* phone
+* birthDate
+* email
+
+Relacionamentos:
+
+* auth (PatientAuth)
+* auditLogs
+* refreshTokens
+
+---
+
+## PatientAuth
+
+Autenticação do paciente.
+
+Campos:
+
+* email
+* passwordHash
+* emailVerified
+
+---
+
+## RefreshToken
+
+Sistema profissional de autenticação com rotação.
+
+Campos:
+
+* kind (EMPLOYEE ou PATIENT)
+* tokenHash (nunca armazenamos token puro)
+* expiresAt
+* revokedAt
+* replacedByTokenHash
+* employeeId ou patientId
+* userAgent
+* ip
+
+Importante:
+O refresh token é armazenado como hash SHA256.
+Nunca é salvo em texto puro no banco.
+
+---
+
+## VerificationCode
+
+Sistema de verificação por código (usado no registro de paciente).
+
+---
+
+## AuditLog
+
+Sistema de auditoria completo.
+
+Registra:
+
+* LOGIN
+* REFRESH
+* LOGOUT
+* REGISTER
+* VERIFY_EMAIL
+
+Inclui:
+
+* quem fez
+* qual entidade
+* qual ID
+* quando fez
+
+Esse sistema é essencial para ambiente hospitalar por rastreabilidade legal.
+
+---
+
+# 3. Sistema de Autenticação Profissional
+
+Foi implementado modelo padrão de mercado:
+
+## Access Token
+
+* JWT
+* expira em 15 minutos
+* usado em todas as requisições autenticadas
+
+## Refresh Token
+
+* válido por 30 dias
+* armazenado no banco
+* hash seguro
+* rotação automática
+* pode ser revogado (logout)
+
+Fluxo:
+
+1. Login → retorna accessToken + refreshToken
+2. Access expira → app chama refresh
+3. Backend:
+
+   * verifica validade
+   * revoga refresh antigo
+   * cria novo refresh
+   * retorna novo access
+4. Logout → revoga refresh
+
+Esse modelo impede uso contínuo de token roubado e é padrão enterprise.
+
+---
+
+# 4. Variáveis de Ambiente (.env)
+
+Arquivo .env obrigatório.
+
+Variáveis utilizadas:
+
+PORT
+Porta do servidor.
+
+DATABASE_URL
+String completa de conexão PostgreSQL.
+
+JWT_ACCESS_SECRET
+Chave secreta do access token (mínimo 20 caracteres).
+
+JWT_ACCESS_EXPIRES_IN
+Tempo de expiração do access token (ex: 15m).
+
+JWT_REFRESH_EXPIRES_DAYS
+Dias de validade do refresh token (ex: 30).
+
+PATIENT_EMAIL_CODE_TTL_SECONDS
+Tempo de validade do código de verificação.
+
+SEED_ROOT_EMAIL
+Email do Root Admin inicial.
+
+SEED_ROOT_PASSWORD
+Senha inicial do Root Admin.
+
+---
+
+# 5. Controle de Permissões
+
+Sistema baseado em Role:
+
+* ROOT_ADMIN
+* ADMIN_COORDINATION
+* HR_ADMIN
+* DOCTOR
+* NURSE
+* NURSE_TECH
+* STAFF
+
+Permissões controladas via middleware:
+
+* authRequired → exige token válido
+* requireEmployeeRole → exige role específica
+
+Campo especial:
+canBuildTeam → controla se médico pode montar equipe.
+
+---
+
+# 6. Segurança Implementada
+
+✔ Senhas com hash seguro
+✔ Refresh token com hash
+✔ Rotação automática de refresh
+✔ Revogação de refresh
+✔ Rate limit em auth
+✔ Auditoria completa
+✔ Separação por roles
+✔ Expiração curta de access token
+✔ Armazenamento seguro no banco
+
+Sistema está em nível profissional para uso real.
+
+---
+
+# 7. Fluxo Atual do Sistema
+
+## Funcionário
+
+Login → recebe access + refresh
+Usa access para acessar sistema
+Se expirar → refresh automático
+Logout → revoga refresh
+
+---
+
+## Paciente
+
+Registro → recebe código por email
+Valida código
+Login → recebe access + refresh
+
+---
+
+# 8. Como Funciona no Emulador Android
+
+A API está acessível pelo endereço:
+
+http://10.0.2.2:3333
+
+Esse IP permite que o emulador Android acesse o backend local.
+
+---
+
+# 9. Estado Atual do Projeto
+
+Backend está:
+
+* Funcionando
+* Com autenticação profissional
+* Com rotação de refresh token
+* Com auditoria
+* Com controle de roles
+* Preparado para CRUD de pacientes, funcionários e agenda
+
+---
+
+# 10. Próximas Etapas Recomendadas
+
+1. Separar auth em módulos menores
+2. CRUD completo de pacientes (validações fortes)
+3. CRUD de funcionários com desligamento RH
+4. Agenda médica
+5. Upload de anexos
+6. Controle de equipes cirúrgicas
+7. Implementar 2FA real via email provider
+8. Implementar logs de segurança avançados
+
+---
+
+# 11. Observações Importantes para Manutenção
+
+Nunca alterar:
+
+* Estrutura do RefreshToken sem migration
+* Lógica de rotação
+* JWT secrets em produção
+
+Sempre que alterar schema:
+
+* Rodar prisma migrate
+* Versionar migrations
+
+Nunca armazenar:
+
+* Token puro no banco
+* Senha sem hash
+
+---
+
+# 12. Conclusão
+
+O backend agora está em padrão profissional:
+
+* Arquitetura organizada
+* Segurança adequada
+* Autenticação robusta
+* Auditoria implementada
+* Preparado para crescimento
+
+Este documento deve ser atualizado sempre que novas features estruturais forem adicionadas.
+
+Sistema pronto para evoluir para ambiente hospitalar real.
+
+---
+
+FIM DO README2
+
+
+
+
+
+Token
+
+
+
+
+Tá 100% claro o que é ✅: **o `$TOKEN` está vazio no seu terminal agora**.
+
+* Sem header → `missing_token` (normal)
+* Com `Bearer $TOKEN` → continua `missing_token` ⇒ porque o header ficou `Bearer ` (sem nada).
+
+Isso acontece porque:
+
+* você abriu outro terminal, ou
+* reiniciou sessão, ou
+* o token nunca foi setado nesse terminal.
+
+Vamos arrumar do jeito mais fácil: **login e já salvar o token automaticamente**.
+
+---
+
+# ✅ 1) Login e salvar o TOKEN automaticamente (sem copiar/colar)
+
+```bash
+cd /home/seixas/Documentos/hospital/backend
+
+TOKEN=$(curl -s -X POST http://localhost:3333/auth/employee/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"root@hospital.com","password":"1234"}' | sed -n 's/.*"accessToken":"\([^"]*\)".*/\1/p')
+
+echo "TOKEN="; echo "$TOKEN" | head -c 40; echo "..."
+```
+
+Se ele imprimir os primeiros caracteres, pronto.
+
+---
+
+# ✅ 2) Testar /patients agora
+
+```bash
+curl -s http://localhost:3333/patients -H "Authorization: Bearer $TOKEN"
+```
+
+---
+
+# ✅ 3) Criar paciente (POST)
+
+```bash
+curl -s -X POST http://localhost:3333/patients \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Paciente Teste","documentType":"CPF","documentId":"12345678901","phone":"71999998888","birthDate":"2000-01-01","email":"paciente1@teste.com"}'
+```
+
+---
+
+## Se ainda assim der missing_token
+
+Então seu middleware `authRequired` está lendo outro campo (ex.: `req.auth` antigo) e não o `Authorization`.
+
+Mas antes de mexer nisso, confirma o básico:
+
+```bash
+echo "Bearer $TOKEN"
+```
+
+Se aparecer “Bearer ” vazio, o token não foi capturado.
+
+---
+
+### Dica pra não perder token toda hora
+
+Como o access expira em 15 minutos, use o refresh no app.
+Mas no terminal, o jeito mais prático é sempre rodar esse comando `TOKEN=$(curl...)` quando precisar testar.
+
+---
+
+Quando você rodar o POST e ele criar o paciente, eu te mando **o patch do app (PatientsScreen)** com:
+
+* lista
+* botão “Novo”
+* formulário separado (components/forms)
+* editar
+* soft delete (com confirmação)
+  tudo bem organizado.
