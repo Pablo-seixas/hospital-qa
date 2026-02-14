@@ -1,0 +1,94 @@
+------------------------------------|---------|----------|---------|---------|-------------------
+File                                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+------------------------------------|---------|----------|---------|---------|-------------------
+All files                           |    8.93 |     5.32 |    7.27 |    9.22 |                   
+ hospital-app                       |     100 |      100 |     100 |     100 |                   
+  App.tsx                           |     100 |      100 |     100 |     100 |                   
+ hospital-app/src/api               |   36.58 |    33.33 |      20 |   39.47 |                   
+  authApi.ts                        |    12.5 |        0 |      25 |    12.5 | 14-22,30-39       
+  config.ts                         |     100 |      100 |     100 |     100 |                   
+  http.ts                           |   52.38 |    31.25 |     100 |   61.11 | 40-52             
+  patientsApi.ts                    |       0 |      100 |       0 |       0 | 15-40             
+  statsApi.ts                       |       0 |      100 |       0 |       0 | 13                
+  tokenStorage.ts                   |   33.33 |      100 |       0 |   33.33 | 7-22              
+ hospital-app/src/data/db           |    2.08 |        0 |       0 |     2.7 |                   
+  migrations.ts                     |       0 |        0 |       0 |       0 | 5-193             
+  sqlite.ts                         |    6.66 |        0 |       0 |    7.14 | 6-30              
+ hospital-app/src/data/repositories |    6.39 |        0 |       0 |    6.66 |                   
+  appointments.repo.ts              |    6.66 |        0 |       0 |    7.14 | 7-40              
+  audit.repo.ts                     |      20 |        0 |       0 |      20 | 6-24              
+  beds.repo.ts                      |       0 |        0 |       0 |       0 | 5-36              
+  employeeSkills.repo.ts            |   14.28 |      100 |       0 |   14.28 | 16-32             
+  employees.admin.repo.ts           |   16.66 |        0 |       0 |   16.66 | 5-16              
+  employees.repo.ts                 |    5.55 |        0 |       0 |    5.88 | 7-59              
+  exams.repo.ts                     |      10 |        0 |       0 |      10 | 21-55             
+  medicalRecords.repo.ts            |    9.09 |        0 |       0 |    9.09 | 18-52             
+  patientDoctors.repo.ts            |    9.09 |        0 |       0 |      10 | 17-46             
+  patientEvents.repo.ts             |       0 |        0 |       0 |       0 | 18-46             
+  patientFiles.repo.ts              |    12.5 |        0 |       0 |    12.5 | 19-43             
+  patients.repo.ts                  |    6.66 |        0 |       0 |    7.14 | 9-51              
+  procedureOrders.repo.ts           |       0 |        0 |       0 |       0 | 22-78             
+  procedureTeam.repo.ts             |       0 |        0 |       0 |       0 | 16-35             
+  services.repo.ts                  |    6.66 |        0 |       0 |    7.14 | 7-36              
+  stats.repo.ts                     |       0 |        0 |       0 |       0 | 3-24              
+ hospital-app/src/domain/entities   |       0 |        0 |       0 |       0 |                   
+  appointment.ts                    |       0 |        0 |       0 |       0 |                   
+  auditLog.ts                       |       0 |        0 |       0 |       0 |                   
+  base.ts                           |       0 |        0 |       0 |       0 |                   
+  bed.ts                            |       0 |        0 |       0 |       0 |                   
+  employee.ts                       |       0 |        0 |       0 |       0 |                   
+  patient.ts                        |       0 |        0 |       0 |       0 |                   
+  serviceType.ts                    |       0 |        0 |       0 |       0 |                   
+ hospital-app/src/domain/enums      |     100 |      100 |     100 |     100 |                   
+  permissions.ts                    |       0 |        0 |       0 |       0 |                   
+  roles.ts                          |     100 |      100 |     100 |     100 |                   
+ hospital-app/src/domain/validators |       0 |        0 |       0 |       0 |                   
+  patient.validators.ts             |       0 |        0 |       0 |       0 | 4-62              
+ hospital-app/src/modules/patients  |       0 |        0 |       0 |       0 |                   
+  patient.validation.ts             |       0 |        0 |       0 |       0 | 3-56              
+  patients.routes.ts                |       0 |        0 |       0 |       0 | 14-230            
+ hospital-app/src/navigation        |   84.61 |       75 |      80 |      80 |                   
+  MainTabs.tsx                      |      50 |      100 |       0 |      50 | 23                
+  RootNavigator.tsx                 |    90.9 |       75 |     100 |    87.5 | 37                
+ hospital-app/src/services/audit    |       0 |        0 |       0 |       0 |                   
+  audit.service.ts                  |       0 |        0 |       0 |       0 | 14-15             
+ hospital-app/src/services/auth     |   96.96 |    90.47 |     100 |     100 |                   
+  auth.service.ts                   |   96.96 |    90.47 |     100 |     100 | 47-51             
+ hospital-app/src/services/rbac     |     100 |       50 |     100 |     100 |                   
+  rbac.ts                           |     100 |       50 |     100 |     100 | 44                
+ hospital-app/src/state             |     100 |       50 |     100 |     100 |                   
+  authStore.ts                      |     100 |       50 |     100 |     100 | 34                
+ hospital-app/src/store             |      25 |        0 |   33.33 |   16.66 |                   
+  auth.store.ts                     |      25 |        0 |   33.33 |   16.66 | 23-29             
+ hospital-app/src/ui/components     |   14.28 |        0 |       0 |      16 |                   
+  Button.tsx                        |      25 |        0 |       0 |      25 | 5-10              
+  Card.tsx                          |      50 |        0 |       0 |      50 | 5                 
+  Input.tsx                         |      50 |      100 |       0 |      50 | 5                 
+  Screen.tsx                        |      50 |      100 |       0 |      50 | 5                 
+  SelectList.tsx                    |       0 |        0 |       0 |       0 | 13-75             
+ hospital-app/src/ui/screens        |    2.13 |     1.02 |    2.38 |    1.88 |                   
+  AppointmentsScreen.tsx            |       0 |        0 |       0 |       0 | 18-67             
+  AuditScreen.tsx                   |       0 |      100 |       0 |       0 | 9-22              
+  AuthScreen.tsx                    |      60 |    33.33 |      50 |   53.84 | 16-20,49-53       
+  DashboardScreen.tsx               |       0 |        0 |       0 |       0 | 14-49             
+  EmployeeDetailScreen.tsx          |       0 |        0 |       0 |       0 | 20-179            
+  EmployeesScreen.tsx               |       0 |        0 |       0 |       0 | 14-55             
+  ForgotPasswordScreen.tsx          |       0 |        0 |       0 |       0 | 6-30              
+  MfaScreen.tsx                     |       0 |        0 |       0 |       0 | 15-31             
+  PatientChartScreen.tsx            |       0 |        0 |       0 |       0 | 29-346            
+  PatientRegisterScreen.tsx         |       0 |        0 |       0 |       0 | 6-41              
+  PatientsScreen.tsx                |       0 |        0 |       0 |       0 | 7-69              
+  ProcedureOrderDetailScreen.tsx    |       0 |        0 |       0 |       0 | 29-227            
+  ServicesScreen.tsx                |       0 |      100 |       0 |       0 | 15-39             
+ hospital-app/src/ui/screens/forms  |       0 |        0 |       0 |       0 |                   
+  AppointmentFormScreen.tsx         |       0 |        0 |       0 |       0 | 21-139            
+  EmployeeFormScreen.tsx            |       0 |        0 |       0 |       0 | 20-160            
+  PatientForm.tsx                   |       0 |        0 |       0 |       0 | 10-38             
+  PatientFormScreen.tsx             |       0 |        0 |       0 |       0 | 16-137            
+  ServiceFormScreen.tsx             |       0 |        0 |       0 |       0 | 15-69             
+ hospital-app/src/utils             |       0 |      100 |       0 |       0 |                   
+  dates.ts                          |       0 |      100 |       0 |       0 | 3                 
+  hash.ts                           |       0 |      100 |       0 |       0 | 4-6               
+  id.ts                             |       0 |      100 |       0 |       0 | 2                 
+  money.ts                          |       0 |      100 |       0 |       0 | 2-3               
+------------------------------------|---------|----------|---------|---------|-------------------
