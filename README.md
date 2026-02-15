@@ -1,78 +1,106 @@
-Hospital – QA e Testes de Software
+Hospital – QA e Testes de Software (TypeScript)
 
-Este repositório contém os artefatos de Qualidade de Software desenvolvidos para o projeto Hospital (aplicação React Native + Node + PostgreSQL).
+Este repositório reúne artefatos e evidências de Qualidade de Software aplicados ao projeto Hospital, uma aplicação em desenvolvimento construída com React Native + Node.js + PostgreSQL, com código e testes em TypeScript.
 
-O foco deste repositório é demonstrar processo de QA, estratégia de testes, evidências de execução e padronização de relatórios.
+O objetivo é demonstrar prática de QA em um cenário real: estratégia, planejamento, execução, evidências e padrões de relatório.
 
-Escopo
+ Contexto do Projeto
 
-• Estratégia de testes  
-• Matriz de cobertura funcional  
-• Testes unitários (Jest)  
-• Testes de autenticação e RBAC  
-• Evidências de execução  
-• Relatório de cobertura  
-• Template profissional de Bug Report  
-• Checklists de validação  
+O sistema estava em desenvolvimento ativo durante a execução dos testes.
+Por isso, a abordagem adotada foi baseada em priorização por risco, concentrando testes nos módulos mais sensíveis (ex.: autenticação, autorização e RBAC).
 
-Estrutura do repositório
+O foco foi validar comportamento e segurança funcional, não “inflar” métricas de cobertura.
 
+ Escopo de QA
+
+Estratégia de testes (baseada em risco)
+
+Matriz de rastreabilidade / cobertura funcional
+
+Testes unitários em TypeScript (Jest)
+
+Testes de autenticação e autorização (RBAC)
+
+Evidências de execução
+
+Relatório de cobertura
+
+Template profissional de Bug Report
+
+Checklists de validação
+
+ Estrutura do repositório
 qa/
-- QA_REPORT.md → Relatório técnico consolidado
-- test-matrix.md → Matriz de rastreabilidade
-- evidence/ → Logs de execução
-- bugs/ → Template de Bug Report
-- checklists/ → Checklists de validação
+- QA_REPORT.md        → Relatório técnico consolidado
+- test-matrix.md      → Matriz de rastreabilidade (casos x requisitos)
+- evidence/           → Evidências e logs de execução
+- bugs/               → Template de Bug Report
+- checklists/         → Checklists de validação
 
 __tests__/
-- Testes unitários de:
+- Testes unitários (TypeScript) de:
   - Auth service
   - Auth store
   - RBAC
   - Renderização de telas principais
-
-Abordagem de Qualidade
+🧪 Abordagem de Qualidade
 
 A estratégia aplicada considera:
 
-• Testes de fluxo positivo e negativo  
-• Casos de falha de autenticação  
-• Simulação de MFA  
-• Validação de permissões por role  
-• Tratamento de erros  
-• Controle de estado (Zustand)  
-• Mock de dependências externas  
+Fluxos positivos e negativos
 
-O objetivo foi validar comportamento e não apenas cobertura numérica.
+Falhas de autenticação (token inválido/expirado, sessão, etc.)
 
-Cobertura atual
+Simulação de MFA (quando aplicável ao fluxo)
 
-Statements: 8.85%  
-Branches: 5.18%  
-Functions: 7.27%  
-Lines: 9.22%  
+Validação de permissões por role (RBAC)
 
-A cobertura priorizou módulos críticos (autenticação e autorização).
+Tratamento de erros e retornos (ex.: API)
 
-Como executar os testes
+Controle de estado (Zustand)
+
+Mocks de dependências externas
+
+📊 Cobertura atual
+
+A cobertura reflete a fase do projeto e a priorização por risco (módulos críticos primeiro):
+
+Statements: 8.85%
+
+Branches: 5.18%
+
+Functions: 7.27%
+
+Lines: 9.22%
+
+Os testes foram concentrados em funcionalidades de autenticação e autorização, por serem áreas críticas para segurança e controle de acesso.
+
+ Como executar os testes
 
 Pré-requisitos:
-Node 20+
 
-Executar:
+Node.js 20+
+
+Instalar dependências:
+
+npm install
+
+Rodar testes:
 
 npx jest
 
-Para rodar com cobertura:
+Rodar com cobertura:
 
 npx jest --coverage
 
-Observação
+Observação: o projeto utiliza testes em TypeScript (ex.: ts-jest quando aplicável na configuração).
+
+ Observação importante
 
 Este repositório não contém o código-fonte completo da aplicação.
-Apenas os artefatos relacionados à qualidade e testes.
+Ele existe para expor o que fica “na vitrine” de QA: processo, estratégia, evidência e documentação.
 
-Autor
+ Autor
 
-Pablo Seixas  
+Pablo Seixas
 QA / Software Quality Engineer
