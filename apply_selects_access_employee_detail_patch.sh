@@ -1,3 +1,5 @@
+data/db/migrations.ts
+
 import { execAsync, getAllAsync, getFirstAsync, runAsync } from "./sqlite";
 import { simpleHash } from "@/utils/hash";
 
