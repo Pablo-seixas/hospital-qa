@@ -43,7 +43,7 @@ __tests__/
   - Auth store
   - RBAC
   - Renderização de telas principais
-🧪 Abordagem de Qualidade
+ Abordagem de Qualidade
 
 A estratégia aplicada considera:
 
@@ -61,7 +61,7 @@ Controle de estado (Zustand)
 
 Mocks de dependências externas
 
-📊 Cobertura atual
+ Cobertura atual
 
 A cobertura reflete a fase do projeto e a priorização por risco (módulos críticos primeiro):
 
