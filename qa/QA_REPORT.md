@@ -1,17 +1,17 @@
-# QA Report
+ QA Report
 
 ## Escopo
 - App React Native (smoke + fluxos principais)
 - Integração com API (quando aplicável)
 
-## Estratégia
+Estratégia
 - Lint/Format
 - Testes unitários (Jest) quando existirem
 - Testes E2E (Detox) para smoke
 - Teste manual com checklist
 
-## Evidências
+Evidências
 - Prints/Vídeos/Logs em `qa/evidence` (não versionar se tiver dados sensíveis)
 
-## Resultados
+Resultados
 - (preencher após rodar pipeline)
