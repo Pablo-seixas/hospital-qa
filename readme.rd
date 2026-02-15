@@ -1,425 +1,185 @@
-# README — Hospital App (Expo + React Native + TypeScript)
+Hospital App (Expo + React Native + TypeScript)
 
-Este documento explica **como o app está organizado**, **o que cada módulo faz**, **regras de permissão**, **fluxos do sistema**, e **como manter/expandir** no futuro — sem código.
+Este documento explica como o app está organizado, o que cada módulo faz, regras de permissão, fluxos do sistema e como manter ou expandir no futuro, sem código.
 
----
+Visão geral
 
-## Visão geral
+Aplicativo mobile (Expo, React Native e TypeScript) para gestão hospitalar com cadastro e gestão de funcionários com cargos, setores, níveis de acesso e auditoria. Cadastro de pacientes com validações fortes de documento, telefone e nascimento. Agendamentos por dia, semana e mês com médico, serviço e possibilidade de alteração a qualquer momento. Prontuário do paciente com anotações, exames e anexos. Tipos de serviço, tratamento e preços na área administrativa. Controle de leitos com status vago ou ocupado e previsão de liberação. Ordens de procedimento ou pedido cirúrgico com equipe multiprofissional. Auditoria completa com histórico do que foi feito, por quem, quando e estados antes e depois. Recursos de RH com desligamento pelo app, bloqueando login e mantendo histórico. Relatórios em PDF com exportação detalhada.
 
-Aplicativo mobile (Expo/React Native/TypeScript) para gestão hospitalar com:
+Stack e dependências principais
 
-* Cadastro e gestão de **Funcionários** (com cargos, setores, níveis de acesso e auditoria)
-* Cadastro de **Pacientes** (validações fortes de documento, telefone e nascimento)
-* **Agendamentos** (dia/semana/mês) com médico, serviço e possibilidade de alteração a qualquer momento
-* **Prontuário** do paciente (anotações, exames e anexos)
-* **Tipos de serviço / tratamento / preços** (área ADM)
-* **Leitos** (vago/ocupado e previsão de liberação)
-* **Ordens de Procedimento / Pedido Cirúrgico** (tipo ordem de serviço) com equipe multiprofissional
-* **Auditoria completa** (histórico do que foi feito, por quem, quando, antes/depois)
-* **RH**: desligamento pelo app (bloqueio de login mantendo histórico)
-* Relatórios em **PDF** (exportação detalhada)
+Expo SDK versão 54.
+React Native.
+TypeScript.
+React Navigation com native stack e bottom tabs.
+SQLite local via expo-sqlite.
+Auditoria via tabela audit_logs.
+Anexos via expo-document-picker e expo-file-system.
+Relatórios PDF via expo-print e expo-sharing.
 
----
+Arquitetura de pastas
 
-## Stack e dependências principais
+src/navigation
 
-* Expo SDK (54.x)
-* React Native
-* TypeScript
-* React Navigation: native-stack + bottom-tabs
-* SQLite local (expo-sqlite)
-* Auditoria via tabela `audit_logs`
-* Anexos via `expo-document-picker` + `expo-file-system`
-* Relatórios PDF via `expo-print` + `expo-sharing`
+Responsável pela navegação do aplicativo.
+RootNavigator.tsx define o stack principal, incluindo autenticação, área principal e telas de detalhe e formulário.
+MainTabs.tsx define as abas como Dashboard, Funcionários, Pacientes, Agenda, Ordens, Serviços e Histórico.
 
----
+Manutenção da navegação exige que qualquer tela nova seja registrada no RootNavigator ou nas abas do MainTabs. Os tipos de navegação ficam centralizados em types.ts.
 
-## Arquitetura de pastas
+src/ui
 
-### `src/navigation/`
+Camada de interface, contendo telas e componentes.
 
-Responsável pela navegação:
+src/ui/screens
 
-* `RootNavigator.tsx`: stack principal (Auth → Main + telas de detalhe/form)
-* `MainTabs.tsx`: abas (Dashboard, Funcionários, Pacientes, Agenda, Ordens, Serviços, Histórico)
+Inclui telas principais como Dashboard com indicadores e últimos logins, Employees para lista e busca de funcionários, EmployeeDetail com detalhes e permissões, Patients para lista e busca de pacientes, PatientChart com prontuário, exames e anexos com controle de acesso, Appointments para agenda, ProcedureOrders para ordens e procedimentos, ProcedureOrderDetail com detalhe da ordem, equipe, permissões e geração de PDF, e Audit com histórico geral.
 
-Manutenção:
+src/ui/screens/forms
 
-* Sempre que criar tela nova, registre a rota no `RootNavigator` e/ou Tab no `MainTabs`.
-* Tipos de navegação ficam em `types.ts`.
+Formulários isolados para criação e edição. Inclui EmployeeForm, PatientForm, AppointmentForm com seletores, ServiceForm para tipo de serviço e preço, e ProcedureOrderForm para ordens.
 
----
+src/ui/components
 
-### `src/ui/`
+Componentes reutilizáveis como Input, Button, Screen e Card. Inclui SelectList, um seletor pesquisável para paciente, médico, serviço e outros. Componentes devem ser pequenos e específicos, evitando lógica direta de banco dentro de componentes simples.
 
-Camada de interface (telas e componentes).
+src/data
 
-#### `src/ui/screens/`
+Camada de dados usando SQLite e repositórios.
 
-Telas principais:
+src/data/db
 
-* **Dashboard**: indicadores e últimos logins
-* **Employees**: lista e busca
-* **EmployeeDetail**: detalhe do funcionário, permissões e RH
-* **Patients**: lista e busca
-* **PatientChart**: prontuário + exames + anexos (com controle de acesso)
-* **Appointments**: agenda
-* **ProcedureOrders**: ordens/procedimentos
-* **ProcedureOrderDetail**: detalhe, equipe, permissões e PDF
-* **Audit**: histórico geral
+Arquivo sqlite.ts com helpers para execução de SQL.
+Arquivo migrations.ts responsável por criação e alteração de tabelas.
 
-#### `src/ui/screens/forms/`
+Toda mudança estrutural deve entrar em migrations.ts. Tabelas devem ser criadas com CREATE TABLE IF NOT EXISTS. Novas colunas devem ser adicionadas via ALTER TABLE após checagem com PRAGMA table_info.
 
-Formulários separados:
+src/data/repositories
 
-* `EmployeeForm` (criar/editar funcionário)
-* `PatientForm` (criar/editar paciente)
-* `AppointmentForm` (agendamento com selects)
-* `ServiceForm` (tipo de serviço/preço)
-* `ProcedureOrderForm` (criar/editar ordem)
+Repositórios por domínio, responsáveis por CRUD e consultas. Incluem repositórios de funcionários, pacientes, agendamentos, serviços, anexos do paciente, médicos vinculados ao paciente, ordens de procedimento, equipe da ordem, eventos do paciente como óbito, auditoria e estatísticas.
 
-#### `src/ui/components/`
+A interface nunca chama SQL diretamente. Cada repositório tem responsabilidade clara e isolada.
 
-Componentes reutilizáveis:
+src/domain
 
-* Input, Button, Screen, Card
-* `SelectList`: seletor pesquisável (para paciente/médico/serviço etc.)
+Camada de regras de negócio.
+Inclui validadores de paciente como CPF, RG, CNH, telefone e nascimento.
+Inclui regras de permissão definindo quem pode ver ou alterar ordens, equipes e anexos.
 
-Manutenção:
+Toda regra de negócio deve estar aqui. A interface apenas consome essas regras.
 
-* Componentes devem ser pequenos e específicos.
-* Evitar lógica de banco direto dentro de componente simples (deixar na tela/repo/service).
+src/services
 
----
+Serviços que não são CRUD puro.
+Inclui autenticação com login, logout e bloqueio de RH.
+Inclui serviço de auditoria para gravação de logs.
+Inclui geração e compartilhamento de relatórios PDF.
 
-### `src/data/`
+Serviços coordenam múltiplos repositórios quando necessário.
 
-Camada de dados (SQLite + repositórios).
+Banco de dados
 
-#### `src/data/db/`
+Funcionários
 
-* `sqlite.ts`: helpers de execução SQL
-* `migrations.ts`: criação/alteração de tabelas (migrações)
+Tabela employees inclui role, jobTitle e sector.
+RH controla status ACTIVE ou TERMINATED.
+Permissão especial canBuildTeam define se o funcionário pode montar equipe.
+Tudo é auditado na tabela audit_logs.
 
-Regra de manutenção:
+Desligamento de RH não apaga o funcionário. Apenas muda o status para TERMINATED, bloqueia login e mantém todo o histórico.
 
-* Qualquer mudança estrutural (tabela/coluna) entra em `migrations.ts`.
-* Sempre criar com `CREATE TABLE IF NOT EXISTS`.
-* Para colunas novas, usar `ALTER TABLE` com checagem `PRAGMA table_info`.
+Pacientes
 
-#### `src/data/repositories/`
+Tabela patients com documentType, documentId, phone e birthDate obrigatórios e validados.
+patient_files armazena anexos.
+patient_doctors controla médicos vinculados ao paciente.
+patient_events registra eventos como óbito.
 
-Repositórios por domínio (CRUD e queries):
+Agenda e atendimento
 
-* `employees.repo.ts` / `employees.admin.repo.ts` (admin: canBuildTeam, terminate)
-* `patients.repo.ts`
-* `appointments.repo.ts`
-* `services.repo.ts`
-* `patientFiles.repo.ts` (anexos)
-* `patientDoctors.repo.ts` (médicos marcados do paciente)
-* `procedureOrders.repo.ts` (ordens)
-* `procedureTeam.repo.ts` (equipe da ordem)
-* `patientEvents.repo.ts` (eventos como óbito)
-* `audit.repo.ts` / `stats.repo.ts`
+Tabela appointments com patientId, doctorEmployeeId, serviceTypeId, scheduledAt e status.
+O agendamento sempre usa seletores para paciente, médico e serviço.
+Ao criar ou editar um agendamento, o médico é automaticamente marcado como médico do paciente na tabela patient_doctors.
 
-Regra de manutenção:
+Serviços e tratamentos
 
-* UI chama repos/serviços, não SQL direto.
-* Cada repo faz uma responsabilidade clara.
+Tabela service_types com nome, tipo de tratamento e preço em centavos.
 
----
+Ordens de procedimento
 
-### `src/domain/`
+Tabela procedure_orders com paciente, médico solicitante, status, prioridade e data prevista.
+Tabela procedure_team_members com membros da equipe e função.
+O médico responsável é marcado como líder.
 
-Regras do domínio (validações e permissões).
+Auditoria
 
-* `validators/`: validações do paciente (CPF/RG/CNH, telefone, nascimento)
-* `permissions/`: regras de acesso (quem pode ver/alterar ordem, equipe, anexos)
+Tabela audit_logs registra ator, ação, entidade, identificador, estados antes e depois e metadados. Essa tabela é a base de rastreabilidade do sistema.
 
-Regra:
+Regras de validação
 
-* Se tiver regra “de negócio”, ela deve ir aqui.
-* UI só consome a regra, não inventa permissão na tela.
+Paciente deve possuir documento válido, telefone com 10 ou 11 dígitos, data de nascimento no formato YYYY-MM-DD. O ano de nascimento não pode ser maior que o ano atual nem menor que o ano atual menos 126.
 
----
+Controle de acesso
 
-### `src/services/`
+Root Admin tem acesso total.
+Médico tem acesso parcial conforme vínculo.
+Outros profissionais acessam apenas por vínculo com equipe.
 
-Serviços que não são “CRUD puro”:
+Prontuário e anexos
 
-* `auth/`: login/logout (inclui bloqueio RH)
-* `audit/`: gravação do audit log
-* `reports/`: geração e compartilhamento de PDF
+Root Admin pode ver, abrir e excluir.
+Médico só pode acessar se estiver marcado como médico do paciente.
+Outros perfis não acessam anexos.
 
-Regra:
+Ordens e procedimentos
 
-* Serviços coordenam múltiplos repositórios quando necessário.
+Root sempre vê.
+Equipe da ordem vê.
+Médico pode ver se estiver vinculado ao paciente.
+Outros só veem se fizerem parte da equipe.
 
----
+Montagem de equipe
 
-## Banco de dados (tabelas principais)
+Root sempre pode.
+Coordenação é prevista no modelo.
+Médico só pode montar equipe se for líder e se Root tiver liberado canBuildTeam.
 
-### Funcionários
+Fluxos principais
 
-* `employees`
+Cadastro de funcionário é feito pelo Root, com auditoria completa.
+Cadastro de paciente exige validação obrigatória.
+Agendamento seleciona paciente, médico e serviço e marca vínculo automaticamente.
+Prontuário permite atualização de informações clínicas e exames.
+Anexos são salvos localmente e registrados em banco.
+Ordens de procedimento organizam equipes e responsabilidades.
+Óbito é registrado como evento com auditoria.
+Relatórios PDF podem ser gerados e compartilhados.
 
-  * inclui `role`, `jobTitle`, `sector`
-  * RH: `status` (`ACTIVE` ou `TERMINATED`)
-  * permissão especial: `canBuildTeam` (0/1)
-* Auditoria: `audit_logs` registra tudo
+Soft delete
 
-**RH Desligamento:**
+A exclusão é lógica, usando isDeleted e deletedAt, mantendo histórico e auditoria.
 
-* Não apaga funcionário: muda status para `TERMINATED`
-* Mantém histórico e impede login.
+Manutenção futura
 
----
+Não misturar responsabilidades entre UI, repositório, serviços e domínio.
+Novas funcionalidades exigem migração, repositório, telas, rotas, auditoria e permissões.
+Novos papéis exigem ajuste de roles, permissões e interface.
 
-### Pacientes
+Observações
 
-* `patients`
+Anexos são locais por enquanto.
+PDF é gerado por HTML.
+Coordenação precisa ter role definido para permissões automáticas.
 
-  * `documentType` (CPF/RG/CNH)
-  * `documentId`, `phone`, `birthDate` obrigatórios (com validação)
-* `patient_files`: anexos
-* `patient_doctors`: médicos marcados do paciente (controle de acesso)
-* `patient_events`: eventos (óbito etc.)
+Checklist de produção
 
----
+Backend centralizado, autenticação real, controle de acesso server-side, upload em storage, logs, backups, criptografia e trilhas de auditoria imutáveis.
 
-### Agenda / Atendimento
+Glossário
 
-* `appointments`
-
-  * `patientId`, `doctorEmployeeId`, `serviceTypeId`
-  * `scheduledAt` (timestamp)
-  * `status` (SCHEDULED/DONE/CANCELED)
-* Agendamento tem **selects** (paciente, médico e serviço).
-
-**Importante:** ao criar/editar agendamento, o sistema marca automaticamente o médico como “médico do paciente” (em `patient_doctors`).
-
----
-
-### Serviços / Tratamentos / Preços
-
-* `service_types`
-
-  * nome, tipo de tratamento, preço (centavos)
-
----
-
-### Ordem de Procedimento / Pedido Cirúrgico
-
-* `procedure_orders`
-
-  * paciente, médico solicitante, status, prioridade, data prevista
-* `procedure_team_members`
-
-  * membros da equipe com função
-  * `isLead=1` para médico responsável (lead)
-
----
-
-### Auditoria
-
-* `audit_logs`
-
-  * `actorEmployeeId`, `actorName`
-  * `action` (LOGIN/CREATE/UPDATE/DELETE/EXPORT…)
-  * `entity` (EMPLOYEE/PATIENT/APPOINTMENT/PROCEDURE_ORDER…)
-  * `beforeJson`, `afterJson`, `metaJson`
-
-Essa tabela é a base do “quem fez o quê”.
-
----
-
-## Regras de validação
-
-### Paciente (obrigatório)
-
-* Documento: CPF ou RG ou CNH
-* Telefone: 10 ou 11 dígitos (DDD + número)
-* Data nascimento: formato `YYYY-MM-DD`
-* Ano de nascimento:
-
-  * **máximo:** ano atual (ex.: 2026)
-  * **mínimo:** ano atual - 126
-
----
-
-## Controle de acesso e permissões
-
-### Níveis (alto nível)
-
-* **ROOT_ADMIN**: acesso total
-* **DOCTOR**: acesso parcial (depende de marcações/papéis)
-* **Outros (enfermagem/técnico etc.)**: acesso por vínculo (equipe selecionada)
-
-### Prontuário e anexos (PDF/imagem)
-
-* Root Admin: **vê/abre/exclui**
-* Médico: **só vê/abre/exclui** se estiver **marcado como médico do paciente** (`patient_doctors`)
-* Enfermagem/Técnico/Outros: **não veem anexos** (por regra atual)
-
-### Ordens e “o que será feito”
-
-* Root: sempre vê
-* Equipe selecionada na ordem: vê
-* Médico: pode ver se for médico marcado do paciente (regra reforçada)
-* Outros: só vê se estiver na equipe daquela ordem
-
-### Quem pode montar/alterar equipe (ordem)
-
-* Root: sempre pode
-* Coordenação: (previsto no modelo; depende do role que você decidir fixar)
-* Médico:
-
-  * só se for **responsável (lead)** **e**
-  * só se Root tiver liberado `canBuildTeam=1`
-
-### RH Desligamento
-
-* Root executa desligamento do funcionário:
-
-  * status vira `TERMINATED`
-  * login bloqueado
-  * histórico permanece
-* O sistema não permite desligar o próprio Root para não “matar” o app.
-
----
-
-## Fluxos principais
-
-### 1) Cadastro de funcionário
-
-* Root cadastra funcionário com:
-
-  * nome, número, email, telefone
-  * role + cargo + setor
-  * senha
-* Auditoria grava CREATE/UPDATE/DELETE (soft)
-
-### 2) Cadastro de paciente
-
-* Obrigatório: documento + telefone + nascimento (validado)
-* Auditoria grava mudanças
-
-### 3) Agendamento
-
-* Seleciona paciente, médico, serviço (SelectList)
-* Define data/hora e duração
-* Ao salvar, marca automaticamente o médico do paciente em `patient_doctors`
-* Auditoria grava tudo
-
-### 4) Prontuário + exames
-
-* Médico/Root atualiza resumo/diagnóstico/obs
-* Exames: criar, marcar DONE, registrar resultado
-* Auditoria grava alterações
-
-### 5) Anexos do paciente
-
-* Root (e médico marcado) pode anexar PDF/imagem
-* Arquivo é salvo localmente no storage do app
-* Registro vai para `patient_files`
-* Abertura do arquivo usa o app do sistema (PDF viewer / galeria)
-
-### 6) Ordem / Procedimento (ordem de serviço do hospital)
-
-* Cria uma ordem com descrição, prioridade e status
-* Monta equipe multiprofissional com funções
-* Pode ter vários médicos (um lead responsável)
-
-### 7) Óbito
-
-* Registro em `patient_events` e `audit_logs`
-* Pode ser exportado no relatório PDF
-
-### 8) Relatório PDF
-
-* Gera PDF com dados do paciente e ordem/equipe
-* Compartilha (WhatsApp/Drive/email etc., conforme o aparelho)
-
----
-
-## Soft delete (exclusão segura)
-
-Quase tudo é “exclusão lógica”:
-
-* `isDeleted = 1`
-* `deletedAt` preenchido
-
-Benefícios:
-
-* mantém auditoria e histórico
-* evita perda de dados por engano
-
----
-
-## Como fazer manutenção no futuro
-
-### Regra de ouro
-
-**Não misturar responsabilidade:**
-
-* UI: só exibe e chama ações
-* Repo: SQL e consultas
-* Services: orquestração entre repos
-* Domain: regras/validações/permissões
-
-### Quando criar algo novo
-
-1. Criar tabela/coluna em `migrations.ts`
-2. Criar repo correspondente
-3. Criar telas (lista + form + detalhe), se necessário
-4. Registrar rotas (RootNavigator / Tabs)
-5. Adicionar auditoria (CREATE/UPDATE/DELETE/EXPORT)
-6. Aplicar permissão no `domain/permissions`
-
-### Como adicionar um novo papel (ex.: Coordenação)
-
-* Criar um `Role` novo (ex.: `COORDINATOR`)
-* Ajustar `RoleLabel`
-* Ajustar `canManageSurgeryTeam` para aceitar esse role
-* Criar UI no funcionário para escolher esse role
-* (Opcional) criar tab/tela específica de “Central Cirúrgica”
-
----
-
-## Observações importantes (limitações atuais)
-
-* Anexos ficam **localmente** no dispositivo por enquanto (não há servidor/cloud).
-* PDF é gerado por HTML (rápido e funciona bem no Expo).
-* “Coordenação” está prevista no fluxo, mas você precisa definir qual `role` oficial vai ser usado (ex.: `COORDINATOR_ADMIN` ou `SURGERY_COORDINATOR`) para a permissão ficar 100% automática.
-
----
-
-## Checklist de “produção” (quando for subir isso de verdade)
-
-* Backend (API + banco central) para sincronizar vários celulares
-* Autenticação real + tokens
-* Controle de acesso “server-side”
-* Upload de anexos em storage (S3/GCS)
-* Logs e backups
-* Criptografia (LGPD)
-* Trilhas de auditoria com hash/imutabilidade (se necessário)
-
----
-
-## Glossário (nomes usados no hospital)
-
-* **Prontuário**: histórico clínico do paciente
-* **Pedido cirúrgico / solicitação de procedimento**: o médico solicita a cirurgia/procedimento
-* **Mapa cirúrgico / agenda cirúrgica**: programação do centro cirúrgico
-* **Equipe multiprofissional**: cirurgião, assistentes, anestesista, enfermagem, técnico etc.
-* **Coordenação do Centro Cirúrgico**: pessoa que organiza equipe/agenda (comum ser enfermeiro coordenador)
-* **Óbito**: evento crítico registrado com auditoria
-
----
-
-Se você quiser, eu também escrevo um README “para dev” com:
-
-* padrão de commits,
-* como versionar migrações,
-* como testar permissões (cenários),
-* e como gerar dados fake para testes (seed).
+Prontuário é o histórico clínico.
+Pedido cirúrgico é a solicitação médica.
+Mapa cirúrgico é a agenda do centro cirúrgico.
+Equipe multiprofissional envolve vários profissionais.
+Coordenação do centro cirúrgico organiza equipe e agenda.
+Óbito é evento crítico registrado com auditoria.
