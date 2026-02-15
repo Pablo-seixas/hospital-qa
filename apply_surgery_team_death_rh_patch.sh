@@ -1,9 +1,4 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-# ---------------------------
-# 1) MIGRATIONS: tabelas novas e colunas em employees
-cat > src/data/db/migrations.ts <<'EOF'
+/data/db/migrations.ts '
 import { execAsync, getAllAsync, getFirstAsync, runAsync } from "./sqlite";
 import { simpleHash } from "@/utils/hash";
 
@@ -207,11 +202,11 @@ export async function migrate() {
     );
   }
 }
-EOF
+
 
 # ---------------------------
 # 2) REPOS: Procedure Orders + Team + Patient Events + RH (employees)
-cat > src/data/repositories/procedureOrders.repo.ts <<'EOF'
+cat > src/data/repositories/procedureOrders.repo.ts 
 import { getAllAsync, getFirstAsync, runAsync } from "@/data/db/sqlite";
 import { id } from "@/utils/id";
 
@@ -292,7 +287,7 @@ export const ProcedureOrdersRepo = {
     return runAsync("UPDATE procedure_orders SET isDeleted=1, deletedAt=?, updatedAt=? WHERE id=?", [now, now, orderId]);
   },
 };
-EOF
+
 
 cat > src/data/repositories/procedureTeam.repo.ts <<'EOF'
 import { getAllAsync, runAsync } from "@/data/db/sqlite";
@@ -337,7 +332,7 @@ export const ProcedureTeamRepo = {
 };
 EOF
 
-cat > src/data/repositories/patientEvents.repo.ts <<'EOF'
+cat > src/data/repositories/patientEvents.repo.ts 
 import { getAllAsync, runAsync } from "@/data/db/sqlite";
 import { id } from "@/utils/id";
 
@@ -386,9 +381,9 @@ export const PatientEventsRepo = {
     return row;
   },
 };
-EOF
 
-cat > src/data/repositories/employees.admin.repo.ts <<'EOF'
+
+cat > src/data/repositories/employees.admin.repo.ts 
 import { getFirstAsync, runAsync } from "@/data/db/sqlite";
 
 export const EmployeesAdminRepo = {
@@ -410,11 +405,12 @@ export const EmployeesAdminRepo = {
     );
   },
 };
-EOF
 
-# ---------------------------
-# 3) Permission helpers
-cat > src/domain/permissions/permissions.ts <<'EOF'
+
+
+ Permission helpers
+domain/permissions/permissions.ts 
+
 import { Role } from "@/domain/enums/roles";
 
 export function canManageSurgeryTeam(args: {
@@ -442,11 +438,11 @@ export function canSeeOrder(args: { isRoot: boolean; isTeamMember: boolean; isDo
   if (args.role === Role.DOCTOR && args.isDoctorOfPatient) return true;
   return false;
 }
-EOF
+
 
 # ---------------------------
 # 4) PDF report generator (HTML -> PDF)
-cat > src/services/reports/patientReport.service.ts <<'EOF'
+cat > src/services/reports/patientReport.service.ts 
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 
@@ -479,12 +475,12 @@ export async function generateAndSharePdf(args: {
   }
   return uri;
 }
-EOF
+
 
 # ---------------------------
 # 5) RH / Auth: impedir login se status != ACTIVE
 # (ajuste simples no auth service - compatível com seu padrão)
-cat > src/services/auth/auth.service.ts <<'EOF'
+cat > src/services/auth/auth.service.ts 
 import { EmployeesRepo } from "@/data/repositories/employees.repo";
 import { simpleHash } from "@/utils/hash";
 import { auditLog } from "@/services/audit/audit.service";
@@ -515,12 +511,12 @@ export async function login(email: string, password: string) {
 export async function logout() {
   return true;
 }
-EOF
 
-# ---------------------------
+
+
 # 6) UI: nova tela "Ordens" e detalhe (com equipe)
 # Adiciona ao Tabs: Procedures
-cat > src/navigation/MainTabs.tsx <<'EOF'
+cat > src/navigation/MainTabs.tsx
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
@@ -560,7 +556,7 @@ export function MainTabs() {
 EOF
 
 # Navigation routes (OrderForm + OrderDetail)
-cat > src/navigation/types.ts <<'EOF'
+cat > src/navigation/types.ts 
 export type RootStackParamList = {
   Auth: undefined;
   Mfa: undefined;
@@ -580,9 +576,9 @@ export type RootStackParamList = {
 
   Audit: undefined;
 };
-EOF
 
-cat > src/navigation/RootNavigator.tsx <<'EOF'
+
+cat > src/navigation/RootNavigator.tsx 
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RootStackParamList } from "./types";
@@ -622,10 +618,10 @@ export function RootNavigator(props: { initialRoute: keyof RootStackParamList })
     </Stack.Navigator>
   );
 }
-EOF
+
 
 # Screens: list orders
-cat > src/ui/screens/ProcedureOrdersScreen.tsx <<'EOF'
+cat > src/ui/screens/ProcedureOrdersScreen.tsx 
 import React, { useEffect, useState } from "react";
 import { FlatList, Text, View } from "react-native";
 import { Screen } from "@/ui/components/Screen";
@@ -677,10 +673,10 @@ export function ProcedureOrdersScreen({ navigation }: Props) {
     </Screen>
   );
 }
-EOF
+
 
 # Form: create/edit order (médico solicitante = usuário logado se for médico; admin pode criar também)
-cat > src/ui/screens/forms/ProcedureOrderFormScreen.tsx <<'EOF'
+cat > src/ui/screens/forms/ProcedureOrderFormScreen.tsx 
 import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, Text } from "react-native";
 import { Screen } from "@/ui/components/Screen";
@@ -797,10 +793,10 @@ export function ProcedureOrderFormScreen({ navigation, route }: Props) {
     </Screen>
   );
 }
-EOF
+
 
 # Detail: equipe + permissões + PDF + óbito
-cat > src/ui/screens/ProcedureOrderDetailScreen.tsx <<'EOF'
+cat > src/ui/screens/ProcedureOrderDetailScreen.tsx 
 import React, { useEffect, useMemo, useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
 import { Screen } from "@/ui/components/Screen";
@@ -1039,7 +1035,4 @@ export function ProcedureOrderDetailScreen({ navigation, route }: Props) {
     </Screen>
   );
 }
-EOF
 
-echo "✅ Patch aplicado: Ordem/Equipe/Permissões/Óbito/PDF/RH."
-echo "➡️ Rode: npx expo start -c"
