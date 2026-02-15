@@ -289,7 +289,7 @@ export const ProcedureOrdersRepo = {
 };
 
 
-cat > src/data/repositories/procedureTeam.repo.ts <<'EOF'
+ src/data/repositories/procedureTeam.repo.ts 
 import { getAllAsync, runAsync } from "@/data/db/sqlite";
 import { id } from "@/utils/id";
 
@@ -330,7 +330,7 @@ export const ProcedureTeamRepo = {
     );
   },
 };
-EOF
+
 
 cat > src/data/repositories/patientEvents.repo.ts 
 import { getAllAsync, runAsync } from "@/data/db/sqlite";
