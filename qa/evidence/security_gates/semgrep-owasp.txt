@@ -1,0 +1,35 @@
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 445 files tracked by git with 544 Code rules:
+                                                                                                                        
+  Language      Rules   Files          Origin      Rules                                                                
+ ─────────────────────────────        ───────────────────                                                               
+  <multilang>       6     445          Community     544                                                                
+  html              1     180                                                                                           
+  ts               71     168                                                                                           
+  json              3      16                                                                                           
+  bash              1      11                                                                                           
+  js               65      10                                                                                           
+  yaml             19       2                                                                                           
+                                                                                                                        
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 0 (0 blocking)
+ • Rules run: 101
+ • Targets scanned: 445
+ • Parsed lines: ~100.0%
+ • Scan skipped: 
+   ◦ Files matching .semgrepignore patterns: 1236
+ • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
+Ran 101 rules on 445 files: 0 findings.
+(need more rules? `semgrep login` for additional free Semgrep Registry rules)
+
+If Semgrep missed a finding, please send us feedback to let us know!
+See https://semgrep.dev/docs/reporting-false-negatives/
