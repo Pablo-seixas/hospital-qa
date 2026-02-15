@@ -17,7 +17,7 @@
 ┌──────────────┐
 │ Scan Summary │
 └──────────────┘
-✅ Scan completed successfully.
+ Scan completed successfully.
  • Findings: 0 (0 blocking)
  • Rules run: 30
  • Targets scanned: 444
